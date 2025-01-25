@@ -10,11 +10,13 @@ load_dotenv()
 openai.api_key = os.getenv('OPENAI_API_KEY')
 openai_model = os.getenv('MODEL_NAME')  # Sử dụng mô hình đã được định nghĩa trong .env
 
-# Function to summarize term content
-def summarize_content(term):
-    system_prompt = """You are a lecturer teaching a hig school student attending global competition in finance, she needs to understand every term, explain her in simple term but detailed enough with formula and use cases."""
+# Function to summarize transcript content
+def summarize_content(transcript):
+    system_prompt = """You are an training expert about security. You are tasked with summarizing lessons on Java. 
+    Generate a summary of the main topics covered in the lesson in an easy to understand format but it should be detailed enough for newcomers to learn Java.
+    Additionally, generate a few review questions based on the content of the lesson."""
     
-    user_prompt = f"term content: {term}\n\nSummarize the content and generate a formula style that can be displayed in streamlit example with review questions."
+    user_prompt = f"Transcript content: {transcript}\n\nSummarize the content and generate a AWS example with review questions."
 
     response = openai.ChatCompletion.create(
         model=openai_model,
@@ -49,23 +51,23 @@ def convert_to_text_file(content):
     return content.encode()
 
 # Streamlit app interface
-st.title("Finance Professor")
-# Text area for inputting term
-term = st.text_area("Paste your term here")
+st.title("Java Technical Homies")
+# Text area for inputting transcript
+transcript = st.text_area("Paste your transcript here")
 
 # Sidebar information
 with st.sidebar:
     st.header("Lam Hoang Cat Vy")
     st.subheader("IT - Young Talents - VPBank")
-    st.write("**Actual working roles:** Business Analyst, System Analyst, CloudOps, Python Developer, Automation Test Developer, Tester")
+    st.write("**Actual working roles:** Business Analyst, System Analyst, CloudOps, AWS Developer, Automation Test Developer, Tester")
     st.write("**Email:** vylhc@vpbank.com.vn | catvyisworking@gmail.com")
     st.write("**Contact:** 0898177342")
 
-# If term is provided, process it
-if term:
+# If transcript is provided, process it
+if transcript:
     try:
         # Generate summary, code example, and review questions
-        summary_response = summarize_content(term)
+        summary_response = summarize_content(transcript)
         st.write("Generated Summary, Code Example, and Review Questions:")
         st.write(summary_response)  # Display the generated content
 
@@ -77,30 +79,12 @@ if term:
         st.session_state.conversation_history.append({"role": "assistant", "content": summary_response})
 
         # Download the entire summary as a README-like text file
-        text_file_data = convert_to_text_file(summary_response)
         st.download_button(label="📥 Download full response as README", 
                            data=text_file_data, 
-                           file_name="README.txt", 
+                           file_name="Java-Summary.txt", 
                            mime="text/plain")
-        
-    #     # Chat section
-    #     st.write("### Ask Follow-up Questions:")
-    #     user_question = st.text_input("Ask a question based on the content")
-        
-    #     if user_question:
-    #         # Add the user's question to the conversation history
-    #         st.session_state.conversation_history.append({"role": "user", "content": user_question})
-            
-    #         # Get the follow-up response from OpenAI
-    #         follow_up_response = ask_follow_up(user_question, st.session_state.conversation_history)
-            
-    #         # Display the response
-    #         st.write(f"**Assistant:** {follow_up_response}")
-            
-    #         # Add the assistant's response to the conversation history
-    #         st.session_state.conversation_history.append({"role": "assistant", "content": follow_up_response})
 
     except Exception as e:
         st.error(f"Error: {e}")
 else:
-    st.info("Please paste your term to generate a summary, code example, and review questions.")
+    st.info("Please paste your transcript to generate a summary, code example, and review questions.")

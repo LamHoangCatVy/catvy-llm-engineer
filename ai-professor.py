@@ -10,11 +10,13 @@ load_dotenv()
 openai.api_key = os.getenv('OPENAI_API_KEY')
 openai_model = os.getenv('MODEL_NAME')  # Sử dụng mô hình đã được định nghĩa trong .env
 
-# Function to summarize term content
-def summarize_content(term):
-    system_prompt = """You are a lecturer teaching a hig school student attending global competition in finance, she needs to understand every term, explain her in simple term but detailed enough with formula and use cases."""
+# Function to summarize transcript content
+def summarize_content(transcript):
+    system_prompt = """You are an GraphRAG export and working as professor at Harvard University tasked with teaching lessons on Knowledge Graphs for RAG System. 
+    Generate a lesson with detailed knowledge for GraphRAG based on the content of the transcript/your knowledge.
+    Additionally, generate a few review questions based on the content of the lesson."""
     
-    user_prompt = f"term content: {term}\n\nSummarize the content and generate a formula style that can be displayed in streamlit example with review questions."
+    user_prompt = f"Transcript content: {transcript}\n\n. "
 
     response = openai.ChatCompletion.create(
         model=openai_model,
@@ -49,9 +51,9 @@ def convert_to_text_file(content):
     return content.encode()
 
 # Streamlit app interface
-st.title("Finance Professor")
-# Text area for inputting term
-term = st.text_area("Paste your term here")
+st.title("Graph RAG Professor")
+# Text area for inputting transcript
+transcript = st.text_area("Paste your transcript here")
 
 # Sidebar information
 with st.sidebar:
@@ -61,12 +63,12 @@ with st.sidebar:
     st.write("**Email:** vylhc@vpbank.com.vn | catvyisworking@gmail.com")
     st.write("**Contact:** 0898177342")
 
-# If term is provided, process it
-if term:
+# If transcript is provided, process it
+if transcript:
     try:
         # Generate summary, code example, and review questions
-        summary_response = summarize_content(term)
-        st.write("Generated Summary, Code Example, and Review Questions:")
+        summary_response = summarize_content(transcript)
+        st.write("Generated Lecture:")
         st.write(summary_response)  # Display the generated content
 
         # Initialize conversation history
@@ -103,4 +105,4 @@ if term:
     except Exception as e:
         st.error(f"Error: {e}")
 else:
-    st.info("Please paste your term to generate a summary, code example, and review questions.")
+    st.info("Please paste your transcript.")
